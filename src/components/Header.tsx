@@ -1,43 +1,35 @@
 "use client"
 
-import { useState } from "react"
-import InfoModal from "./InfoModal"
+import { LuInfo, LuMenu } from "react-icons/lu"
 
-export const  Header = () => {
-  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false)
+interface HeaderProps {
+  onToggleSidebar: () => void
+  onToggleInfoModal: () => void
+}
 
-  return (
-    <>
-      <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">AI Chat Interface</h1>
-            <p className="text-sm text-muted-foreground">
-              Ask questions and see both the AI response and raw JSON data
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
+export const Header = ({ onToggleSidebar, onToggleInfoModal }: HeaderProps) => {
+    return (
+        <header className="fixed top-0 left-0 right-0 z-50 border-b border-gray-700 backdrop-blur-sm bg-gray-900/95">
+        <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-3">
             <button
-              onClick={() => setIsInfoModalOpen(true)}
-              className="p-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors"
-              aria-label="Show app information"
+                onClick={onToggleSidebar}
+                className="p-2 hover:bg-gray-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                aria-label="Alternar barra lateral"
             >
-              <svg className="w-5 h-5 text-secondary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+                <LuMenu className="w-5 h-5" />
             </button>
+            <h1 className="text-lg font-semibold text-white">Interfaz de Chat IA</h1>
+            </div>
 
-          </div>
+            <button
+            onClick={onToggleInfoModal}
+            className="p-2 hover:bg-gray-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            aria-label="Mostrar información"
+            >
+            <LuInfo className="w-5 h-5" />
+            </button>
         </div>
-      </header>
-
-      <InfoModal isOpen={isInfoModalOpen} onClose={() => setIsInfoModalOpen(false)} />
-    </>
-  )
+        </header>
+    )
 }
