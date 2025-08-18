@@ -15,4 +15,6 @@
 3. En un navegador local, dirigirse a ```http://localhost:8000```
 
 
+### Puedes probar el proyecto en vivo en el siguiente enlace:
+[https://test-aivo.vercel.app/](https://test-aivo.vercel.app/)
 

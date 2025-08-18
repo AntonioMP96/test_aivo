@@ -193,7 +193,7 @@ export const ChatInterface = ({ currentMessage, onNewMessage, onAskAgain }: Chat
                 ref={textareaRef}
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Escribe tu pregunta aquí... (Ctrl+Enter para enviar)"
+                placeholder="Describe aquí tu situación... (Ctrl+Enter para enviar)"
                 className="w-full min-h-[120px] p-4 bg-gray-800 border border-gray-700 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-white"
                 disabled={isLoading}
                 maxLength={2000}
