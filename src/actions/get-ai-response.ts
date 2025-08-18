@@ -101,12 +101,26 @@ Promise<{ok: boolean, response?: ResponseItem, message?: string}> => {
         if (!airesponse.text) {
             throw new Error('No se pudo obtener la respuesta de la IA');
         }
-        const parsed: ResponseItem[] = JSON.parse(airesponse.text); // leyendo correctamente el texto
+        const parsed: ResponseItem[] = JSON.parse(airesponse.text); // leyendo correctamente el texto como JSON
         const readable = parsed[0].readable; // texto legible
         const jsonresponse = parsed[0].jsonresponse; // respuesta en formato JSON
 
         if (!readable || !jsonresponse) {
             throw new Error('No se pudo obtener la respuesta de la IA')
+        }
+
+        if (!(
+            jsonresponse !== null &&
+            typeof jsonresponse === 'object' &&
+            typeof jsonresponse.date === 'string' &&
+            typeof jsonresponse.description === 'string' &&
+            typeof jsonresponse.injuries === 'boolean' &&
+            typeof jsonresponse.location === 'string' &&
+            typeof jsonresponse.owner === 'boolean' &&
+            typeof jsonresponse.complete === 'boolean' &&
+            typeof jsonresponse.question === 'string'
+        )) {
+            throw new Error('El JSON obtenido no cumple el formato especificado')
         }
         
         const response = {
