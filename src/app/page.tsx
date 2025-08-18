@@ -1,103 +1,102 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+import { useState, useEffect } from "react"
+import { Header } from "@/components/Header"
+import { InfoModal } from "@/components/InfoModal"
+import { Sidebar } from "@/components/Sidebar"
+import { ChatInterface } from "@/components/ChatInterface"
+import { useLocalStorage } from "@/hooks/use-local-storage"
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+export interface ChatMessage {
+  id: string
+  question: string
+  answer: string
+  jsonResponse: string
+  timestamp: number
+  followUpQuestions?: Array<{
+    id: string
+    question: string
+    answer: string
+    jsonResponse: string
+    timestamp: number
+  }>
+  pendingFollowUp?: {
+    question: string
+    timestamp: number
+  }
+}
+
+export default function Page() {
+  const [mounted, setMounted] = useState(false) // estado de carga de la pagina
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false) // estado del menu lateral
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false) // estado del modal informativo
+  const [currentMessage, setCurrentMessage] = useState<ChatMessage | null>(null) // conversacion que se muestra en pantalla
+
+  const [chatHistory, setChatHistory, clearChatHistory, isHistoryLoaded] = useLocalStorage<ChatMessage[]>(
+    "chatHistory",
+    [],
+  )
+
+  useEffect(() => {
+    setMounted(true) // colocar estado de carga
+  }, [])
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen)
+  const toggleInfoModal = () => setIsInfoModalOpen(!isInfoModalOpen)
+
+  const handleNewMessage = (message: ChatMessage) => {
+    if (message.id !== currentMessage?.id) {
+      setChatHistory((prev) => [...prev, message]) // agregar nuevo
+    } else {
+      setChatHistory((prev) => prev.map((msg) => (msg.id === message.id ? message : msg))) // reemplazar si ya existe
+    }
+    setCurrentMessage(message)
+  }
+
+  const handleSelectHistoryItem = (message: ChatMessage) => {
+    setCurrentMessage(message)
+    setIsSidebarOpen(false)
+  }
+
+  const handleAskAgain = () => {
+    setCurrentMessage(null)
+  }
+
+  const handleClearHistory = () => {
+    clearChatHistory()
+    setCurrentMessage(null)
+    setIsSidebarOpen(false)
+  }
+
+  // loader para evitar errores de hidratacion:
+  if (!mounted || !isHistoryLoaded) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="flex items-center space-x-3">
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent"></div>
+          <p className="text-muted-foreground">Cargando...</p>
         </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-950 text-white">
+      <Header onToggleSidebar={toggleSidebar} onToggleInfoModal={toggleInfoModal} />
+
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        chatHistory={chatHistory}
+        onSelectMessage={handleSelectHistoryItem}
+        onClearHistory={handleClearHistory}
+      />
+
+      <InfoModal isOpen={isInfoModalOpen} onClose={() => setIsInfoModalOpen(false)} />
+
+      <main className="pt-16">
+        <ChatInterface currentMessage={currentMessage} onNewMessage={handleNewMessage} onAskAgain={handleAskAgain} />
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
-  );
+  )
 }
