@@ -52,7 +52,7 @@ export const InfoModal = ({ isOpen, onClose }: InfoModalProps) => {
                     </p>
                     <ol className="list-decimal list-inside space-y-1 ml-2">
                         <li>Date: La fecha del suceso en formato yyyy-mm-dd. </li>
-                        <li>Location: El lugar donde ocurrió el suceso (puede ser una dirección o "domicilio titular"). </li>
+                        <li>Location: El lugar donde ocurrió el suceso (puede ser una dirección o &quot;domicilio titular&quot;). </li>
                         <li>Description: Una breve descripción de lo sucedido en una sola oración. </li>
                         <li>Injuries: Indicar si hay heridos (true o false). </li>
                         <li>Owner: Indicar si el usuario es el titular del objeto protagonista del hecho (true o false). </li>
